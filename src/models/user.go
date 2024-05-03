@@ -19,6 +19,7 @@ type VirtualUser struct {
 	State      bool   `json:"state"`
 	AvataImage string `json:"avataImage"`
 }
+
 type Token struct {
 	Token        string `json:"token"`
 	Refreshtoken string `json:"refreshToken"`
