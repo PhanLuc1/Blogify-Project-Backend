@@ -4,7 +4,7 @@ import "time"
 
 type Post struct {
 	Id         int         `json:"id"`
-	User       VirtualUser `json:"user"`
+	User       User        `json:"user"`
 	Caption    string      `json:"caption"`
 	PostImages []PostImage `json:"postImages"`
 	CreateAt   time.Time   `json:"createAt"`
@@ -15,13 +15,13 @@ type PostImage struct {
 	ImageURL string `json:"imageURL"`
 }
 type Comment struct {
-	Id            int         `json:"id"`
-	User          VirtualUser `json:"user"`
-	PostId        int         `json:"postId"`
-	Content       string      `json:"content"`
-	CreateAt      time.Time   `json:"creatAt"`
-	ParentComment *Comment    `json:"parentComment"`
-	Reaction      Reaction    `json:"reaction"`
+	Id            int       `json:"id"`
+	User          User      `json:"user"`
+	PostId        int       `json:"postId"`
+	Content       string    `json:"content"`
+	CreateAt      time.Time `json:"creatAt"`
+	ParentComment *Comment  `json:"parentComment"`
+	Reaction      Reaction  `json:"reaction"`
 }
 type Reaction struct {
 	Id            int    `json:"id"`
