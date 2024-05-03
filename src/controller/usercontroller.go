@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/database"
+	generate "github.com/PhanLuc1/Blogify-Project-Backend/src/middleware"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/models"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,7 +55,38 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(201)
-
 	w.Write([]byte(`{"message": "Your account has been created"}`))
+}
+func Login(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	var foundUser models.User
+	var tokenUser models.Token
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 
+	err = database.Client.QueryRow("SELECT user.id,user.email, user.password FROM user WHERE email =?", user.Email).Scan(
+		&foundUser.Id,
+		&foundUser.Email,
+		&foundUser.Password,
+	)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(`{"Message": "Email is not avilable"}`))
+		return
+	}
+
+	PasswordIsValid, msg := VerifyPassword(user.Password, foundUser.Password)
+	if !PasswordIsValid {
+		http.Error(w, msg, 401)
+		return
+	}
+	token, refreshToken, _ := generate.TokenGeneration(foundUser.Id)
+	tokenUser.Token = token
+	tokenUser.Refreshtoken = refreshToken
+
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(tokenUser)
 }
