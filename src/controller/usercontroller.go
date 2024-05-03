@@ -38,7 +38,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	re := regexp.MustCompile(emailRegex)
-	if !re.MatchString(*&user.Email) {
+	if !re.MatchString(user.Email) {
 		w.WriteHeader(422)
 		w.Write([]byte(`{"error": "Invalid email format"}`))
 		return
@@ -54,7 +54,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(201)
-	
+
 	w.Write([]byte(`{"message": "Your account has been created"}`))
 
 }
