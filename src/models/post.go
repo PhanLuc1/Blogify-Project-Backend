@@ -11,8 +11,9 @@ type Post struct {
 	Comments   []Comment   `json:"comments"`
 }
 type PostImage struct {
-	Id       int    `json:"id"`
-	ImageURL string `json:"imageURL"`
+	Id          int    `json:"id"`
+	ImageURL    string `json:"imageURL"`
+	Description string `json:"Description"`
 }
 type Comment struct {
 	Id            int       `json:"id"`
