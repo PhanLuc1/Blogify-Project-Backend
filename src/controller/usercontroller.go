@@ -80,7 +80,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	PasswordIsValid, msg := VerifyPassword(user.Password, foundUser.Password)
 	if !PasswordIsValid {
-		http.Error(w, msg, 401)
+		http.Error(w, msg, http.StatusUnauthorized)
 		return
 	}
 	token, refreshToken, _ := generate.TokenGeneration(foundUser.Id)
