@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/PhanLuc1/Blogify-Project-Backend/src/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -22,3 +23,19 @@ func DBSet() *sql.DB {
 }
 
 var Client *sql.DB = DBSet()
+
+func GetImageProduct(postId int) (postImages []models.PostImage, err error) {
+	result1, err := Client.Query("SELECT * FROM postimage WHERE postId = ?", postId)
+	if err != nil {
+		return nil, err
+	}
+	for result1.Next() {
+		var imageTemp models.PostImage
+		err := result1.Scan(&imageTemp.Id, &imageTemp.ImageURL, &imageTemp.Description)
+		if err != nil {
+			return nil, err
+		}
+		postImages = append(postImages, imageTemp)
+	}
+	return postImages, nil
+}
