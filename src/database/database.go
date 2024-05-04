@@ -25,7 +25,7 @@ func DBSet() *sql.DB {
 var Client *sql.DB = DBSet()
 
 func GetImageProduct(postId int) (postImages []models.PostImage, err error) {
-	result1, err := Client.Query("SELECT * FROM postimage WHERE postId = ?", postId)
+	result1, err := Client.Query("SELECT postimage.id, postimage.imageURL, postimage.description FROM postimage WHERE postId = ?", postId)
 	if err != nil {
 		return nil, err
 	}
@@ -38,4 +38,17 @@ func GetImageProduct(postId int) (postImages []models.PostImage, err error) {
 		postImages = append(postImages, imageTemp)
 	}
 	return postImages, nil
+}
+func GetInfoUser(userId int) (user models.User, err error) {
+	err = Client.QueryRow("SELECT user.id, user.email, user.username, user.state, user.avataImage FROM user").Scan(
+		&user.Id,
+		&user.Email,
+		&user.Username,
+		&user.State,
+		&user.AvataImage,
+	)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
