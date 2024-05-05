@@ -19,17 +19,24 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 	}
 	for result.Next() {
 		var post models.Post
-		result.Scan(&post.Id, userId, &post.Caption, &post.CreateAt)
-		post.PostImages, err = database.GetImageProduct(post.Id)
+		result.Scan(&post.Id, &userId, &post.Caption, &post.CreateAt)
+
+		post.PostImages, err = models.GetImageProduct(post.Id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		post.User, err = database.GetInfoUser(userId)
+		post.User, err = models.GetInfoUser(userId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		post.Reaction, err = models.GetReactionPost(post.Id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		posts = append(posts, post)
 	}
 	w.WriteHeader(200)
