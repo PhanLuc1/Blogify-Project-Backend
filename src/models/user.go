@@ -1,5 +1,7 @@
 package models
 
+import "github.com/PhanLuc1/Blogify-Project-Backend/src/database"
+
 type User struct {
 	Id         int    `json:"id"`
 	Email      string `json:"email"`
@@ -23,4 +25,18 @@ type VirtualUser struct {
 type Token struct {
 	Token        string `json:"token"`
 	Refreshtoken string `json:"refreshToken"`
+}
+
+func GetInfoUser(userId int) (user User, err error) {
+	err = database.Client.QueryRow("SELECT user.id, user.email, user.username, user.state, user.avataImage FROM user WHERE id = ?", userId).Scan(
+		&user.Id,
+		&user.Email,
+		&user.Username,
+		&user.State,
+		&user.AvataImage,
+	)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
