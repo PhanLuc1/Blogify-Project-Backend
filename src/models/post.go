@@ -20,15 +20,6 @@ type PostImage struct {
 	ImageURL    string `json:"imageURL"`
 	Description string `json:"Description"`
 }
-type Comment struct {
-	Id            int       `json:"id"`
-	User          User      `json:"user"`
-	PostId        int       `json:"postId"`
-	Content       string    `json:"content"`
-	CreateAt      time.Time `json:"creatAt"`
-	ParentComment *Comment  `json:"parentComment"`
-	Reaction      Reaction  `json:"reaction"`
-}
 func GetImageProduct(postId int) (postImages []PostImage, err error) {
 	result1, err := database.Client.Query("SELECT postimage.id, postimage.imageURL, postimage.description FROM postimage WHERE postId = ?", postId)
 	if err != nil {

@@ -20,10 +20,31 @@ func GetReactionPost(postId int) (Reaction, error) {
 		result.Scan(&userId)
 		user, err := GetInfoUser(userId)
 		if err != nil {
-			return Reaction{} , err 
+			return Reaction{}, err
 		}
 		users = append(users, user)
-		CountReaction ++
+		CountReaction++
+	}
+	reaction := Reaction{users, CountReaction}
+	return reaction, nil
+}
+func GetReactionComment(Comment int) (Reaction, error) {
+	var users []User
+	CountReaction := 0
+	query := "SELECT userId FROM comment_reaction WHERE commentId = ?"
+	result, err := database.Client.Query(query, Comment)
+	if err != nil {
+		return Reaction{}, err
+	}
+	for result.Next() {
+		var userId int
+		result.Scan(&userId)
+		user, err := GetInfoUser(userId)
+		if err != nil {
+			return Reaction{}, err
+		}
+		users = append(users, user)
+		CountReaction++
 	}
 	reaction := Reaction{users, CountReaction}
 	return reaction, nil
