@@ -12,4 +12,5 @@ var RegisterUserRoutes = func(router *mux.Router) {
 	router.HandleFunc("/user/logging", controller.Login).Methods("POST")
 	router.HandleFunc("/user/authentication", auth.GetNewTokenFromRefreshToken).Methods("GET")
 	router.HandleFunc("/user/authentication/code", auth.GetCodeSendMail).Methods("POST")
+	router.HandleFunc("/user/authentication/codeauthentication", auth.AuthenticateCode).Methods("POST")
 }
