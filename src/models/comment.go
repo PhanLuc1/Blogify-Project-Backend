@@ -16,7 +16,7 @@ type Comment struct {
 	Content         string        `json:"content"`
 	CreateAt        time.Time     `json:"creatAt"`
 	Replies         []Comment     `json:"parentComment"`
-	Reaction        Reaction      `json:"reactionComment"`
+	Reaction        Reaction      `json:"reaction"`
 }
 
 func GetCommentsForPost(postID int) ([]Comment, error) {
