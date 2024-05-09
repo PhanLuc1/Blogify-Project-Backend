@@ -24,7 +24,7 @@ func GetCodeSendMail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-    w.WriteHeader(200)
+	w.WriteHeader(200)
 }
 func GenerateOTP() string {
 	const otpLength = 6
@@ -62,4 +62,23 @@ func SendEmail(email string) error {
 	}
 
 	return nil
+}
+func AuthenticateCode(w http.ResponseWriter, r *http.Request) {
+	var jsonData map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&jsonData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	email := jsonData["email"]
+	code := jsonData["code"]
+
+	emailStr := email.(string)
+	codeStr := code.(string)
+	if codeMap[emailStr] != codeStr {
+		http.Error(w, "code is incorrect", 401)
+		return
+	}
+	delete(codeMap, emailStr)
+	w.WriteHeader(200)
 }
