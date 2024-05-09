@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/database"
 	generate "github.com/PhanLuc1/Blogify-Project-Backend/src/middleware"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/models"
@@ -89,4 +90,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(tokenUser)
+}
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	user, err = models.GetInfoUser(claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(user)
 }
