@@ -76,7 +76,7 @@ func AuthenticateCode(w http.ResponseWriter, r *http.Request) {
 	emailStr := email.(string)
 	codeStr := code.(string)
 	if codeMap[emailStr] != codeStr {
-		http.Error(w, "code is incorrect", 401)
+		http.Error(w, "code is incorrect", http.StatusUnauthorized)
 		return
 	}
 	delete(codeMap, emailStr)
