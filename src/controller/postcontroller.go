@@ -101,3 +101,6 @@ func PostReact(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 }
+func GetPostById(w http.Response, r *http.Request) {
+
+}
