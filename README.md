@@ -154,8 +154,11 @@
 ### Request body if comment is subcomment 
 ```json
 {
-  "content" : "...",
-  "parentCommnetId" : "..." 
+    "content" : "đẹp vcl",
+    "parentCommentId" :  {
+        "Int64": 3,
+        "Valid": false
+        }
 }
 ```
 ### Response 
@@ -164,6 +167,25 @@
   "message" : "created"
 }
 ```
+## 1.2.3 `Reaction` Post
+- Endpoint : `/posts/{postid}/reaction`
+- Method : `Get`
+### Request header 
+```json
+{
+  "token" :  " ... "
+}
+```
+### Response status 200
+## 1.2.4 `Reaction` Comment
+- Endpoint : `/posts/{commentid}/reaction`
+- Method : `GET`
+```json
+{
+  "token" :  " ... "
+}
+```
+### Response status `200`
 # 2.User
 ## 2.1 Registration
 - Endpoint : `/user/registration/`
