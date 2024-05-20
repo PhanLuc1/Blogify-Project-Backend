@@ -170,3 +170,49 @@
   "token" : " ... "
 }
 ```
+## 2.3 GetCode
+- Endpoint :`/auth/code`
+- Method: `Post`
+```json 
+{
+  "email"
+}
+```
+### Response
+```json 
+{
+  "status" : "200"
+}
+```
+## 2.4 Auth code
+- Endpoint :`/auth`
+- Method: `post`
+### Request body
+```json
+{
+  "email" : "...",
+  "code" : "..."
+}
+```
+### Response 
+-400 or 200 
+## 2.5 User Info
+- Endpoint : `/user`
+- Method: `Get`
+### Request header
+```json
+{
+  "token" : "... "
+}
+```
+### Response 
+```json
+{
+    "id": 6,
+    "email": "lucptt22@gmail.com",
+    "username": "",
+    "password": "",
+    "state": true,
+    "avataImage": ""
+}
+```
