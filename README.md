@@ -99,10 +99,11 @@
 
 ### 1.2.1. Create `post` table
 
-- Endpoint: `/post/creating`
+- Endpoint: `/posts/creating`
 - Method: `POST`
 
 #### Request header
+
 
 ```json
 {
@@ -131,12 +132,38 @@
 
 ```json
 {
-  "message": "200" // int
+  "message": "created" // int
 }
 ```
 
 ### 1.2.2. Create `Comment` table
-
+- Endpoint : `/posts/{postid}/comment`
+- Method : "Post"
+## Request Header
+```json
+{
+  "Token" : " .... "
+}
+```
+## Request body if not subcomment 
+```json  
+{
+  "content" : "....."
+}
+```
+## Request body if comment is subcomment 
+```json
+{
+  "content" : "...",
+  "parentCommnetId" : "..." 
+}
+```
+## Response 
+```json 
+{
+  "message" : "created"
+}
+```
 # 2.User
 ## 2.1 Registration
 - Endpoint : `/user/registration/`
