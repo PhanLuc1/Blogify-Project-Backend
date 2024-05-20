@@ -244,7 +244,7 @@
 }
 ```
 ### Response 
--400 or 200 
+- 400 or 200 
 ## 2.5 User Info
 - Endpoint : `/user`
 - Method: `Get`
