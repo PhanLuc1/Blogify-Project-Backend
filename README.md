@@ -89,7 +89,12 @@
     .....
 ]
 ```
-
+### Response 
+``` json
+{
+  "message" : "200"
+}
+```
 ## 1.2. Create post 
 
 ### 1.2.1. Create `post` table
@@ -121,7 +126,7 @@
             },
    ] 
 }
-
+```
 #### Response 
 
 ```json
