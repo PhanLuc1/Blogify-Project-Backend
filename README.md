@@ -265,3 +265,21 @@
     "avataImage": ""
 }
 ```
+## 2.6 User `update`
+- Endpoint : `/user/update`
+- Method : `POST`
+### Request header 
+```json
+{
+  "token" : " .... "
+}
+```
+### Request body
+- 1 or 2 or null properties
+```json
+{
+  "username" : "...",
+  "avataImage": "..."
+}
+```
+### Response status `200`
