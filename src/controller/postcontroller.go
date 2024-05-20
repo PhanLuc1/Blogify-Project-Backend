@@ -9,6 +9,7 @@ import (
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/database"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/models"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 )
 
 func GetAllPost(w http.ResponseWriter, r *http.Request) {
@@ -87,12 +88,13 @@ func CreateNewPost(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`"message": "created post"`))
 }
 func PostReact(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postId := vars["postid"]
 	claims, err := auth.GetUserFromToken(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	postId := r.URL.Query().Get("postId")
 	query := "INSERT INTO reaction (userId, postId) VALUES (?, ?)"
 	_, err = database.Client.Query(query, claims.UserId, postId)
 	if err != nil {
@@ -101,6 +103,42 @@ func PostReact(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 }
-func GetPostById(w http.Response, r *http.Request) {
-
+func GetPostById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postId := vars["postid"]
+	var userId int
+	var post models.Post
+	query := "SELECT * FROM post WHERE id = ?"
+	err := database.Client.QueryRow(query, postId).Scan(
+		&post.Id,
+		&userId,
+		&post.Caption,
+		&post.CreateAt,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	post.PostImages, err = models.GetImageProduct(post.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	post.User, err = models.GetInfoUser(userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	post.Comments, err = models.GetCommentsForPost(post.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	post.Reaction, err = models.GetReactionPost(post.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(post)
 }
