@@ -2,9 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/database"
@@ -119,11 +121,31 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	query := "UPDATE user SET username = ?, avataImage = ? WHERE id = ?"
-	_, err = database.Client.Query(query, user.Username, user.AvataImage, claims.UserId)
+	setClauses := []string{}
+	args := []interface{}{}
+
+	if user.Username != "" {
+		setClauses = append(setClauses, "username = ?")
+		args = append(args, user.Username)
+	}
+	if user.AvataImage != "" {
+		setClauses = append(setClauses, "avataImage = ?")
+		args = append(args, user.AvataImage)
+	}
+
+	if len(setClauses) == 0 {
+		http.Error(w, "No fields to update", http.StatusBadRequest)
+		return
+	}
+
+	query := fmt.Sprintf("UPDATE user SET %s WHERE id = ?", strings.Join(setClauses, ", "))
+	args = append(args, claims.UserId)
+
+	_, err = database.Client.Exec(query, args...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 }
