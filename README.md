@@ -137,3 +137,36 @@
 
 ### 1.2.2. Create `Comment` table
 
+# 2.User
+## 2.1 Registration
+- Endpoint : `/user/registration/`
+- Method : `Post`
+### Request body 
+```json
+{
+   "email": "..... ",
+   "password" : "..."
+}
+```
+### Response
+```json
+{
+  "message" : "201"
+}
+```
+## 2.2 Sign-in
+- Endpoint :`/user/sign-in`
+- Method: `Post`
+### Request body 
+```json
+{
+   "email": "..... ",
+   "password" : "..."
+}
+```
+### Response 
+```json
+{
+  "token" : " ... "
+}
+```
