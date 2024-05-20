@@ -136,29 +136,29 @@
 }
 ```
 
-### 1.2.2. Create `Comment` table
+## 1.2.2. Create `Comment` table
 - Endpoint : `/posts/{postid}/comment`
 - Method : "Post"
-## Request Header
+### Request Header
 ```json
 {
   "Token" : " .... "
 }
 ```
-## Request body if not subcomment 
+### Request body if not subcomment 
 ```json  
 {
   "content" : "....."
 }
 ```
-## Request body if comment is subcomment 
+### Request body if comment is subcomment 
 ```json
 {
   "content" : "...",
   "parentCommnetId" : "..." 
 }
 ```
-## Response 
+### Response 
 ```json 
 {
   "message" : "created"
