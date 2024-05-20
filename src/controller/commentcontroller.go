@@ -36,7 +36,7 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		query = "INSERT INTO comment (userId, postId, content, createAt) VALUES (?, ?, ?, ?)"
-		_, err = database.Client.Query(query, claims.UserId, comment.PostId, comment.Content, createAt)
+		_, err = database.Client.Query(query, claims.UserId, postId, comment.Content, createAt)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
