@@ -283,3 +283,14 @@
 }
 ```
 ### Response status `200`
+## 2.7 Get `User` by ID
+- endpoint : `users/{userid}`
+- method : `GET`
+### Request header 
+```json 
+{
+  token : "..."
+}
+```
+### Response status `200`
+ 

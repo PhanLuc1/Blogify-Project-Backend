@@ -160,7 +160,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = auth.GetUserFromToken(r)
 	if err != nil {
-		http.Error(w, err.Error(), 401)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	user, err := models.GetInfoUser(userId)
