@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .header {
+            background-color: #f09433; 
+            background-image: linear-gradient(19deg, #f09433 0%, #e6683c 50%, #dc2743 75%, #cc2366 100%, #bc1888 100%);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .code {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Instagram</h1>
+        </div>
+        <div class="content">
+            <p>Hi,</p>
+            <p>Someone tried to sign up for an Instagram account with your email. If it was you, enter this confirmation code in the app:</p>
+            <div class="code">{{.Code}}</div>
+            <p>If you didn't try to sign up for an Instagram account, you can ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>© Instagram. Meta Platforms, Inc., 1601 Willow Road, Menlo Park, CA 94025</p>
+        </div>
+    </div>
+</body>
+</html>
