@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/smtp"
 
@@ -49,13 +51,30 @@ func SendEmail(email string) error {
 	otp := GenerateOTP()
 	codeMap[email] = otp
 
-	subject := "Mã Xác Thực"
-	body := fmt.Sprintf("Mã xác thực của bạn là: %s", otp)
-	message := fmt.Sprintf("Subject: %s\n\n%s", subject, body)
+	subject := "Your Instagram Code"
+
+	tmpl, err := template.ParseFiles("src/auth/email_template.html")
+	if err != nil {
+		return err
+	}
+
+	var body bytes.Buffer
+	data := struct {
+		Code string
+	}{
+		Code: otp,
+	}
+
+	err = tmpl.Execute(&body, data)
+	if err != nil {
+		return err
+	}
+
+	message := fmt.Sprintf("Subject: %s\nMIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n%s", subject, body.String())
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{email}, []byte(message))
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{email}, []byte(message))
 
 	if err != nil {
 		return err
@@ -63,6 +82,7 @@ func SendEmail(email string) error {
 
 	return nil
 }
+
 func AuthenticateCode(w http.ResponseWriter, r *http.Request) {
 	var jsonData map[string]interface{}
 	err := json.NewDecoder(r.Body).Decode(&jsonData)
