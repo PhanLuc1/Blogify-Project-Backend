@@ -293,4 +293,13 @@
 }
 ```
 ### Response status `200`
- 
+## 2.8 Follow `user`
+- endpoint : `users/{userid}/follower`
+- method : `GET`
+### Request header 
+```json 
+{
+  token : "..."
+}
+```
+### Response status `200`
