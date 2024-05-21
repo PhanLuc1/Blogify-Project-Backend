@@ -25,7 +25,7 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 		var post models.Post
 		result.Scan(&post.Id, &userId, &post.Caption, &post.CreateAt)
 
-		post.PostImages, err = models.GetImageProduct(post.Id)
+		post.PostImages, err = models.GetImagePost(post.Id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -119,7 +119,7 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	post.PostImages, err = models.GetImageProduct(post.Id)
+	post.PostImages, err = models.GetImagePost(post.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

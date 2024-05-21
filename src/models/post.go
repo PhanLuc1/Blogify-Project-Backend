@@ -20,7 +20,8 @@ type PostImage struct {
 	ImageURL    string `json:"imageURL"`
 	Description string `json:"Description"`
 }
-func GetImageProduct(postId int) (postImages []PostImage, err error) {
+
+func GetImagePost(postId int) (postImages []PostImage, err error) {
 	result1, err := database.Client.Query("SELECT postimage.id, postimage.imageURL, postimage.description FROM postimage WHERE postId = ?", postId)
 	if err != nil {
 		return nil, err
