@@ -6,12 +6,14 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/database"
 	generate "github.com/PhanLuc1/Blogify-Project-Backend/src/middleware"
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/models"
+	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -148,4 +150,24 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userid := vars["userid"]
+	userId, err := strconv.Atoi(userid)
+	if err != nil {
+		panic(err)
+	}
+	_, err = auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	user, err := models.GetInfoUser(userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(user)
 }
