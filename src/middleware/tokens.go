@@ -19,13 +19,13 @@ func TokenGeneration(userid int) (signedtoken string, signedrefreshtoken string,
 	claims := &SignedDetails{
 		UserId: userid,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 1)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 100)),
 		},
 	}
 	refreshclaims := &SignedDetails{
 		UserId: userid,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 10)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 1000)),
 		},
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
