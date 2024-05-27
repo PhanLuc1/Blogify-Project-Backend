@@ -52,8 +52,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	password := HashPassword(user.Password)
 	user.Password = password
-	query := "INSERT INTO user (email, username, password, avataImage) VALUES (?, ?, ?, ?)"
-	_, err = database.Client.Query(query, user.Email, user.Username, user.Password, user.AvataImage)
+	query := "INSERT INTO user (email, username, password, avatarImage) VALUES (?, ?, ?, ?)"
+	_, err = database.Client.Query(query, user.Email, user.Username, user.Password, user.AvatarImage)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -78,7 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		&foundUser.Username,
 		&foundUser.Password,
 		&foundUser.State,
-		&foundUser.AvataImage,
+		&foundUser.AvatarImage,
 	)
 	if err != nil {
 		w.WriteHeader(404)
@@ -136,9 +136,9 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		setClauses = append(setClauses, "username = ?")
 		args = append(args, user.Username)
 	}
-	if user.AvataImage != "" {
-		setClauses = append(setClauses, "avataImage = ?")
-		args = append(args, user.AvataImage)
+	if user.AvatarImage != "" {
+		setClauses = append(setClauses, "avatarImage = ?")
+		args = append(args, user.AvatarImage)
 	}
 
 	if len(setClauses) == 0 {
