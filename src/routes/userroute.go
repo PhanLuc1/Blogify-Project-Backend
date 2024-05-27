@@ -15,4 +15,5 @@ var RegisterUserRoutes = func(router *mux.Router) {
 	router.HandleFunc("/user/update", controller.UpdateUser).Methods("POST")
 	router.HandleFunc("/user/{userid}/follower", controller.FollowUser).Methods("POST")
 	router.HandleFunc("/user/{userid}", controller.GetUserById).Methods("GET")
+	router.HandleFunc("/user/test", controller.AvatarHandler).Methods("GET")
 }
