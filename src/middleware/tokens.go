@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"os"
 	"time"
 
@@ -15,29 +14,19 @@ type SignedDetails struct {
 
 var SECRET_KEY = os.Getenv("SECRET_LOVE")
 
-func TokenGeneration(userid int) (signedtoken string, signedrefreshtoken string, err error) {
+func TokenGeneration(userid int) (signedtoken string, err error) {
 	claims := &SignedDetails{
 		UserId: userid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 100)),
 		},
 	}
-	refreshclaims := &SignedDetails{
-		UserId: userid,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 1000)),
-		},
-	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
-	refreshtoken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshclaims).SignedString([]byte(SECRET_KEY))
-	if err != nil {
-		log.Panicln(err)
-		return
-	}
-	return token, refreshtoken, err
+
+	return token, err
 }
 func ValidateToken(signedtoken string) (claims *SignedDetails, msg string) {
 	token, err := jwt.ParseWithClaims(signedtoken, &SignedDetails{}, func(token *jwt.Token) (interface{}, error) {
