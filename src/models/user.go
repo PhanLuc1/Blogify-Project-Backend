@@ -24,7 +24,6 @@ type VirtualUser struct {
 
 type Token struct {
 	Token        string `json:"token"`
-	Refreshtoken string `json:"refreshToken"`
 }
 
 func GetInfoUser(userId int) (user User, err error) {
@@ -39,4 +38,9 @@ func GetInfoUser(userId int) (user User, err error) {
 		return user, err
 	}
 	return user, nil
+}
+
+type Response struct {
+	TokenUser Token `json:"tokenUser"`
+	User      User  `json:"user"`
 }
