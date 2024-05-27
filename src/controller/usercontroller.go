@@ -106,8 +106,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
-	abc := r.URL.Query().Get("code")
-	fmt.Print(abc)
 	var user models.User
 	claims, err := auth.GetUserFromToken(r)
 	if err != nil {
@@ -184,9 +182,4 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	user.AvatarImage = fmt.Sprintf("http://localhost:8080/avatar?avatar=%s", user.AvatarImage)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
-}
-func AvatarHandler(w http.ResponseWriter, r *http.Request) {
-	abc := r.URL.Query().Get("code")
-	fmt.Print(abc)
-	w.WriteHeader(200)
 }
