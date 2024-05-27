@@ -303,3 +303,14 @@
 }
 ```
 ### Response status `200`
+
+## Get `avatarImage` 
+- endpoint : `user/avatar?avata= ...`
+- method : `GET`
+### Request header
+```json
+{
+  token : "..."
+}
+```
+### Response image status 200
