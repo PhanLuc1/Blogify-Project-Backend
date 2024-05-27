@@ -78,7 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		&foundUser.Password,
 	)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(404)
 		w.Write([]byte(`{"Message": "Email is not avilable"}`))
 		return
 	}
