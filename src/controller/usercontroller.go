@@ -72,10 +72,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.Client.QueryRow("SELECT user.id,user.email, user.password FROM user WHERE email =?", user.Email).Scan(
+	err = database.Client.QueryRow("SELECT * FROM user WHERE email =?", user.Email).Scan(
 		&foundUser.Id,
 		&foundUser.Email,
+		&foundUser.Username,
 		&foundUser.Password,
+		&foundUser.State,
+		&foundUser.AvataImage,
 	)
 	if err != nil {
 		w.WriteHeader(404)
@@ -88,12 +91,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusUnauthorized)
 		return
 	}
-	token, refreshToken, _ := generate.TokenGeneration(foundUser.Id)
+	token, _ := generate.TokenGeneration(foundUser.Id)
 	tokenUser.Token = token
-	tokenUser.Refreshtoken = refreshToken
 
+	foundUser.Password = ""
+	var response models.Response
+	response.TokenUser = tokenUser
+	response.User = foundUser
 	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(tokenUser)
+	json.NewEncoder(w).Encode(response)
 }
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	var user models.User
