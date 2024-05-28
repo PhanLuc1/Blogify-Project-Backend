@@ -289,7 +289,7 @@
 ### Request header 
 ```json 
 {
-  token : "..."
+  "token" : "..."
 }
 ```
 ### Response status `200`
@@ -299,7 +299,7 @@
 ### Request header 
 ```json 
 {
-  token : "..."
+  "token" : "..."
 }
 ```
 ### Response status `200`
@@ -310,7 +310,7 @@
 ### Request header
 ```json
 {
-  token : "..."
+  "token" : "..."
 }
 ```
 ### Response image status 200
