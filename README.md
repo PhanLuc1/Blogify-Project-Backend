@@ -99,7 +99,8 @@
 
 ### 1.2.1. Create `post` table
 
-- Endpoint: `/posts/creating`
+- Endpoint: `/upload` 
+  sửa endpoint sau
 - Method: `POST`
 
 #### Request header
