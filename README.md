@@ -295,8 +295,8 @@
 ```
 ### Response status `200`
 
-## Get `avatarImage` 
-- endpoint : `user/avatar?avata= ...`
+## Get `Image` 
+- endpoint : `image?image= ...`
 - method : `GET`
 ### Request header
 ```json
