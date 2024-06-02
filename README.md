@@ -115,8 +115,8 @@
 ```json 
 {
    //form-data 
-   "cation" :" .... " // key
-   "images" :" .... " // key and values upload image
+   "caption" :" .... " // key
+   "images"  :" .... " // key and values upload image
 }
 ```
 #### Response 
