@@ -95,7 +95,7 @@
   "message" : "200"
 }
 ```
-## 1.2. Create post 
+## 1.2. Create post  `NEW UPDATE`
 
 ### 1.2.1. Create `post` table
 
@@ -105,27 +105,17 @@
 #### Request header
 
 
-```json
+```
 {
   "token" :"..." 
 }
 ```
 #### Request body
-```json
+```json 
 {
-   "caption" : "....."
-   "postImage" : [
-     {
-                "id": 2,
-                "imageURL": "abcxyz",
-                "Description": "abcxyz"
-            },
-            {
-                "id": 4,
-                "imageURL": "123456",
-                "Description": "1234444"
-            },
-   ] 
+   form-data 
+   cation :" .... " // key
+   images :" .... " // key and values upload image
 }
 ```
 #### Response 
