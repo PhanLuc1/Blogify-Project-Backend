@@ -14,6 +14,7 @@ func main() {
 	router.Use(middleware.CORSMiddleware)
 	routes.RegisterPostRoutes(router)
 	routes.RegisterUserRoutes(router)
+	routes.RegisterImageRoute(router)
 	log.Println("Listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }

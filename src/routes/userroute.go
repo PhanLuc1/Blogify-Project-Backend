@@ -9,7 +9,6 @@ import (
 var RegisterUserRoutes = func(router *mux.Router) {
 	router.HandleFunc("/user", controller.GetUserInfo).Methods("GET")
 	router.HandleFunc("/user/registration", controller.Signup).Methods("POST")
-	router.HandleFunc("/user/avatar", controller.AvatarHandle).Methods("GET")
 	router.HandleFunc("/user/sign-in", controller.Login).Methods("POST")
 	router.HandleFunc("/auth/code", auth.GetCodeSendMail).Methods("POST")
 	router.HandleFunc("/auth", auth.AuthenticateCode).Methods("POST")
