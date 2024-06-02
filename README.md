@@ -114,9 +114,9 @@
 #### Request body
 ```json 
 {
-   form-data 
-   cation :" .... " // key
-   images :" .... " // key and values upload image
+   //form-data 
+   "cation" :" .... " // key
+   "images" :" .... " // key and values upload image
 }
 ```
 #### Response 
