@@ -99,7 +99,7 @@
 
 ### 1.2.1. Create `post` table
 
-- Endpoint: `/upload` 
+- Endpoint: `/posts/creating` 
   sửa endpoint sau
 - Method: `POST`
 
