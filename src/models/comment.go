@@ -81,3 +81,12 @@ func getCommentsRecursive(db *sql.DB, comments *[]Comment, postID int, parentCom
 
 	return nil
 }
+func GetAmountCommentPost(postId int) (error, int) {
+	var count int
+	query := "SELECT COUNT(*) FROM comment WHERE id = ?"
+	err := database.Client.QueryRow(query, postId).Scan(&count)
+	if err != nil {
+		return err, 0
+	}
+	return nil, count
+}
