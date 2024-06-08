@@ -43,6 +43,11 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		post.CountComment, err = models.GetAmountCommentPost(post.Id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		post.Reaction, err = models.GetReactionPost(post.Id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -169,7 +174,7 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err, post.CountComment = models.GetAmountCommentPost(post.Id)
+	post.CountComment, err = models.GetAmountCommentPost(post.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
