@@ -138,8 +138,12 @@ func PostReact(w http.ResponseWriter, r *http.Request) {
 	query := "INSERT INTO reaction (userId, postId) VALUES (?, ?)"
 	_, err = database.Client.Query(query, claims.UserId, postId)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		query = "DELETE FROM reaction WHERE reaction.userId = ? AND reaction.postId = ?"
+		_, err = database.Client.Query(query, claims.UserId, postId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 	w.WriteHeader(200)
 }
