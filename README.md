@@ -296,7 +296,7 @@
 ```
 ### Response status `200`
 
-## Get `Image` 
+## Get 2.9 `Image` 
 - endpoint : `image?image= ...`
 - method : `GET`
 ### Request header
@@ -306,3 +306,19 @@
 }
 ```
 ### Response image status 200
+## 2.10 Add `Biography` `NEW UPDATE !!!`
+- endpoint : `user/biography`
+- medthod : `POST`
+### Request header
+```json
+{
+  "token" : "..."
+}
+```
+### Request body 
+```json
+{
+  "biography" : "...."
+}
+```
+### Status response `200`
