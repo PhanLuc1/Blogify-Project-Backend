@@ -183,3 +183,23 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
 }
+func AddBiography(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	query := "UPDATE user SET biography = ? WHERE id = ?"
+	_, err = database.Client.Query(query, user.Biography, claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(200)
+}
