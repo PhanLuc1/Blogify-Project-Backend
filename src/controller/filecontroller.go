@@ -9,13 +9,13 @@ import (
 )
 
 func ImageHandle(w http.ResponseWriter, r *http.Request) {
-	avatar := r.URL.Query().Get("image")
-	if avatar == "" {
-		http.Error(w, "Missing avatar parameter", http.StatusBadRequest)
+	imageURL := r.URL.Query().Get("image")
+	if imageURL == "" {
+		http.Error(w, "Missing imageURL parameter", http.StatusBadRequest)
 		return
 	}
 
-	filePath := filepath.Join("C:\\Users\\Admin\\Desktop\\image-blogify", avatar)
+	filePath := filepath.Join("C:\\Users\\Admin\\Desktop\\image-blogify", imageURL)
 
 	file, err := os.Open(filePath)
 	if err != nil {

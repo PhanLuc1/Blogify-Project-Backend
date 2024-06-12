@@ -7,5 +7,4 @@ import (
 
 var RegisterImageRoute = func(router *mux.Router) {
 	router.HandleFunc("/image", controller.ImageHandle).Methods("GET")
-	//router.HandleFunc("/upload", controller.UploadeHandle).Methods("POST")
 }

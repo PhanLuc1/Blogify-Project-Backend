@@ -3,8 +3,11 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -52,8 +55,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	password := HashPassword(user.Password)
 	user.Password = password
-	query := "INSERT INTO user (email, username, password, avatarImage) VALUES (?, ?, ?, ?)"
-	_, err = database.Client.Query(query, user.Email, user.Username, user.Password, user.AvatarImage)
+	query := "INSERT INTO user (email, username, password, biography, avatarImage) VALUES (?, ?, ?, ?, ?)"
+	_, err = database.Client.Query(query, user.Email, user.Username, user.Password, " ", user.AvatarImage)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -83,10 +86,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		w.WriteHeader(404)
-		w.Write([]byte(`{"Message": "Email is not avilable"}`))
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	user.AvatarImage = fmt.Sprintf("http://localhost:8080/avatar?avatar=%s", user.AvatarImage)
 
 	PasswordIsValid, msg := VerifyPassword(user.Password, foundUser.Password)
 	if !PasswordIsValid {
@@ -118,7 +120,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	user.AvatarImage = fmt.Sprintf("http://localhost:8080/avatar?avatar=%s", user.AvatarImage)
+
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
 }
@@ -180,7 +182,6 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user.AvatarImage = fmt.Sprintf("http://localhost:8080/avatar?avatar=%s", user.AvatarImage)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
 }
@@ -226,4 +227,58 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Profile updated successfully"))
+}
+func UploadAvatarImage(w http.ResponseWriter, r *http.Request) {
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	err = r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	files := r.MultipartForm.File["images"]
+	if len(files) == 0 {
+		http.Error(w, "No image file uploaded", http.StatusBadRequest)
+		return
+	}
+
+	fileHeader := files[0]
+	file, err := fileHeader.Open()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+	fileName := filepath.Join("C:\\Users\\Admin\\Desktop\\image-blogify", fileHeader.Filename)
+	dst, err := os.Create(fileName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, file); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	user := models.User{
+		Id:          claims.UserId,
+		AvatarImage: fileHeader.Filename,
+	}
+
+	query := "UPDATE user SET avatarImage = ? WHERE id = ?"
+	_, err = database.Client.Exec(query, user.AvatarImage, user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Avatar image uploaded successfully"))
 }
