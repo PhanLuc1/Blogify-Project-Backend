@@ -306,8 +306,8 @@
 }
 ```
 ### Response image status 200
-## 2.10 Add `Biography` `NEW UPDATE !!!`
-- endpoint : `user/biography`
+## 2.10 Add `Biography Username` `NEW UPDATE !!!`
+- endpoint : `user/updation`
 - medthod : `POST`
 ### Request header
 ```json
@@ -318,7 +318,25 @@
 ### Request body 
 ```json
 {
-  "biography" : "...."
+  "biography" : "....",
+  "username" : "....",
 }
 ```
 ### Status response `200`
+## 2.11 Upload `Avatar Image` `NEW UPDATE`
+- endpoint: `user/updation/avatar`
+- medthod : `POST`
+### RequestHeader
+```json
+{
+  "token" : " ..."
+}
+```
+### RequestBody
+```json
+{
+  //form-data
+  "images" : "..."
+}
+```
+### Response status `200`
