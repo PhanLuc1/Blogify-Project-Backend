@@ -77,6 +77,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		&foundUser.Email,
 		&foundUser.Username,
 		&foundUser.Password,
+		&foundUser.Biography,
 		&foundUser.State,
 		&foundUser.AvatarImage,
 	)
