@@ -184,23 +184,46 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
 }
-func AddBiography(w http.ResponseWriter, r *http.Request) {
+func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	claims, err := auth.GetUserFromToken(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
+
 	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	query := "UPDATE user SET biography = ? WHERE id = ?"
-	_, err = database.Client.Query(query, user.Biography, claims.UserId)
+
+	query := "UPDATE user SET "
+	params := []interface{}{}
+	if user.Biography != "" {
+		query += "biography = ?, "
+		params = append(params, user.Biography)
+	}
+	if user.Username != "" {
+		query += "username = ?, "
+		params = append(params, user.Username)
+	}
+
+	if len(params) > 0 {
+		query = query[:len(query)-2]
+		query += " WHERE id = ?"
+		params = append(params, claims.UserId)
+	} else {
+		http.Error(w, "No valid fields to update", http.StatusBadRequest)
+		return
+	}
+
+	_, err = database.Client.Exec(query, params...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(200)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Profile updated successfully"))
 }
