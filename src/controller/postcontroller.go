@@ -256,3 +256,38 @@ func GetUserPosts(w http.ResponseWriter, r *http.Request) {
 
 	GetPostsByUserId(w, userId)
 }
+func DeletePost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postId := vars["postid"]
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	query := "DELETE FROM comment WHERE postId = ?"
+	_, err = database.Client.Query(query, postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	query = "DELETE FROM reaction WHERE postId = ?"
+	_, err = database.Client.Query(query, postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	query = "DELETE FROM postimage WHERE postId = ?"
+	_, err = database.Client.Query(query, postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	query = "DELETE FROM post WHERE id = ? AND userId = ?"
+	_, err = database.Client.Query(query, postId, claims.UserId)
+	if err != nil {
+		http.Error(w, "You do not have permission to delete this post", http.StatusForbidden)
+		return
+	}
+	w.WriteHeader(200)
+}

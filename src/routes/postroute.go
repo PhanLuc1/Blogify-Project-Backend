@@ -12,4 +12,6 @@ var RegisterPostRoutes = func(router *mux.Router) {
 	router.HandleFunc("/posts/{postid}/comment", controller.CreateComment).Methods("POST")
 	router.HandleFunc("/posts/{postid}/reaction", controller.PostReact).Methods("GET")
 	router.HandleFunc("/posts/{commentid}/reaction", controller.CommentReact).Methods("GET")
+	router.HandleFunc("/posts/{postid}/delete", controller.DeletePost).Methods("DELETE")
+	router.HandleFunc("/posts/{commentid}/delete", controller.DeleteComment).Methods("DELETE")
 }

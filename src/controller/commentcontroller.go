@@ -60,3 +60,25 @@ func CommentReact(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 }
+func DeleteComment(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	commentId := vars["commentid"]
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	query := "DELETE FROM comment_reaction WHERE commentId = ?"
+	_, err = database.Client.Query(query, commentId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	query = "DELETE FROM comment WHERE commentId = ? AND userId = ?"
+	_, err = database.Client.Query(query, commentId, claims.UserId)
+	if err != nil {
+		http.Error(w, "You do not have permission to delete this post", http.StatusForbidden)
+		return
+	}
+	w.WriteHeader(200)
+}
