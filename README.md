@@ -178,6 +178,27 @@
 }
 ```
 ### Response status `200`
+## 1.2.4 Delete `POST` `NEWUPDATE`
+- endpoint: `posts/{postid}/delete`
+- method: `DELETE`
+### Request header 
+```json 
+{
+  "Token" : "..."
+}
+```
+### Response `200` `403` when post not be created by currentUser
+## 1.2.5 Delete `Comment` `NEWUPDATE`
+- endpoint: `posts/{commentId}/delete`
+- method: `DELETE`
+### Request header 
+```json 
+{
+  "Token" : "..."
+}
+```
+### Response `200` `403` when comment not be created by currentUser
+
 # 2.User
 ## 2.1 Registration
 - Endpoint : `/user/registration/`
@@ -285,7 +306,7 @@
 }
 ```
 ### Response status `200`
-## 2.8 Follow `user`
+## 2.8 Follow `user` `UPDATEE`
 - endpoint : `users/{userid}/follower`
 - method : `GET`
 ### Request header 
@@ -340,3 +361,43 @@
 }
 ```
 ### Response status `200`
+## 2.12 Get All `AnotherUser` `NEW UPDATE`
+- endpoint : `/users`
+- method : `GET`
+### Request header 
+```json
+{
+  "token" : " ..."
+}
+```
+### Response status  `200` 
+```json
+[
+    {
+        "id": 1,
+        "username": "lucphan uchihaha",
+        "follower": 1,
+        "following": 1,
+        "avatarImage": "beauty_20201101212051.jpg",
+        "state": true
+    },
+    {
+        "id": 3,
+        "username": "",
+        "follower": 2,
+        "following": 0,
+        "avatarImage": "",
+        "state": true
+    }
+]
+```
+## 2.13 Set `STATE` PRIVATE OR PUBLIC `NEWUPDATE`
+- endpoint: `/user/update/state`
+- method : `GET`
+### Request header 
+```json 
+{
+  "Token" : "..."
+}
+```
+### Response `200`
