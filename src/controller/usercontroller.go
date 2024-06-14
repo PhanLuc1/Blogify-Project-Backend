@@ -306,3 +306,57 @@ func SetUpStateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 }
+func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
+	var users []models.AnotherUser
+
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	currentUserID := claims.UserId
+
+	query := `
+		SELECT u.id, u.username, u.avatarImage, 
+			(SELECT COUNT(*) FROM follower WHERE followedId = u.id) AS followers,
+			(SELECT COUNT(*) FROM follower WHERE followerId = u.id) AS following
+		FROM user u
+		WHERE u.id != ?
+	`
+	rows, err := database.Client.Query(query, currentUserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.AnotherUser
+		err := rows.Scan(&user.Id, &user.Username, &user.AvatarImage, &user.Followers, &user.Following)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		user.State = CheckIfCurrentUserFollows(user.Id, currentUserID)
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(users)
+}
+
+func CheckIfCurrentUserFollows(userID, currentUserID int) bool {
+	query := `
+		SELECT COUNT(*) FROM follower WHERE followerId = ? AND followedId = ?
+	`
+	var count int
+	err := database.Client.QueryRow(query, currentUserID, userID).Scan(&count)
+	if err != nil {
+		return false
+	}
+	return count > 0
+}

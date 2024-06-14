@@ -16,11 +16,13 @@ type Follower struct {
 	FollowerID int `json:"followerId"`
 	FolloweeID int `json:"folloeeID"`
 }
-type VirtualUser struct {
+type AnotherUser struct {
 	Id          int    `json:"id"`
 	Username    string `json:"username"`
-	State       bool   `json:"state"`
+	Followers   int    `json:"follower"`
+	Following   int    `json:"following"`
 	AvatarImage string `json:"avatarImage"`
+	State       bool   `json:"state"`
 }
 
 type Token struct {
