@@ -282,3 +282,27 @@ func UploadAvatarImage(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Avatar image uploaded successfully"))
 }
+func SetUpStateAccount(w http.ResponseWriter, r *http.Request) {
+	var query string
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	state, err := models.GetStateUser(claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if state {
+		query = "UPDATE user SET state = 0 WHERE id = ?"
+	} else {
+		query = "UPDATE user SET state = 1 WHERE id = ?"
+	}
+	_, err = database.Client.Query(query, claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(200)
+}

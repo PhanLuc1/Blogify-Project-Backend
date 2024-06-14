@@ -41,6 +41,15 @@ func GetInfoUser(userId int) (user User, err error) {
 	}
 	return user, nil
 }
+func GetStateUser(userId int) (state bool, err error) {
+	err = database.Client.QueryRow("SELECT user.state FROM user WHERE id = ?", userId).Scan(
+		&state,
+	)
+	if err != nil {
+		return state, err
+	}
+	return state, nil
+}
 
 type Response struct {
 	TokenUser Token `json:"tokenUser"`
