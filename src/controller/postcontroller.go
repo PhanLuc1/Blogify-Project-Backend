@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
@@ -190,4 +191,68 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(post)
+}
+func GetPostsByUserId(w http.ResponseWriter, userId int) {
+	var posts []models.Post
+	query := "SELECT post.id, post.caption, post.createAt FROM post WHERE userId = ?"
+	result, err := database.Client.Query(query, userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for result.Next() {
+		var post models.Post
+		err = result.Scan(
+			&post.Id,
+			&post.Caption,
+			&post.CreateAt,
+		)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		post.User, err = models.GetInfoUser(userId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		post.PostImages, err = models.GetImagePost(post.Id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		post.CountComment, err = models.GetAmountCommentPost(post.Id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		post.Comments, err = models.GetCommentsForPost(post.Id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		posts = append(posts, post)
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(posts)
+}
+func GetCurrentUserPosts(w http.ResponseWriter, r *http.Request) {
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	GetPostsByUserId(w, claims.UserId)
+}
+func GetUserPosts(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userid := vars["userid"]
+	userId, err := strconv.Atoi(userid)
+	if err != nil {
+		panic(err)
+	}
+
+	GetPostsByUserId(w, userId)
 }

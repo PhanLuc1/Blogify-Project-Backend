@@ -7,14 +7,17 @@ import (
 )
 
 var RegisterUserRoutes = func(router *mux.Router) {
+
 	router.HandleFunc("/user", controller.GetUserInfo).Methods("GET")
 	router.HandleFunc("/user/registration", controller.Signup).Methods("POST")
 	router.HandleFunc("/user/sign-in", controller.Login).Methods("POST")
 	router.HandleFunc("/auth/code", auth.GetCodeSendMail).Methods("POST")
 	router.HandleFunc("/auth", auth.AuthenticateCode).Methods("POST")
 	router.HandleFunc("/user/update", controller.UpdateUser).Methods("POST")
-	router.HandleFunc("/user/{userid}/follower", controller.FollowUser).Methods("POST")
-	router.HandleFunc("/user/{userid}", controller.GetUserById).Methods("GET")
-	router.HandleFunc("/user/updation", controller.UpdateProfile).Methods("POST")
-	router.HandleFunc("/user/updation/avatar", controller.UploadAvatarImage).Methods("POST")
+	router.HandleFunc(`/user/{userid:\d+}/follower`, controller.FollowUser).Methods("POST")
+	router.HandleFunc(`/user/{userid:\d+}`, controller.GetUserById).Methods("GET")
+	router.HandleFunc(`/user/{userid:\d+}/posts`, controller.GetUserPosts).Methods("GET")
+	router.HandleFunc("/user/update", controller.UpdateProfile).Methods("POST")
+	router.HandleFunc("/user/update/avatar", controller.UploadAvatarImage).Methods("POST")
+	router.HandleFunc("/user/posts", controller.GetCurrentUserPosts).Methods("GET")
 }
