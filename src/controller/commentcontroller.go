@@ -42,6 +42,7 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	w.WriteHeader(201)
 }
 func CommentReact(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
