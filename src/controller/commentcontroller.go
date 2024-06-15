@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
@@ -15,7 +16,11 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	var comment models.Comment
 	var query string
 	vars := mux.Vars(r)
-	postId := vars["postid"]
+	postid := vars["postid"]
+	postId, err := strconv.Atoi(postid)
+	if err != nil {
+		panic(err)
+	}
 	claims, err := auth.GetUserFromToken(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -42,7 +47,13 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	comments, err := models.GetCommentsForPost(postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(201)
+	json.NewEncoder(w).Encode(comments)
 }
 func CommentReact(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
