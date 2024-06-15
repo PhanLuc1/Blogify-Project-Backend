@@ -37,7 +37,7 @@ func GetInfoUser(userId int) (user User, err error) {
 			(SELECT COUNT(*) FROM follower WHERE followedId = u.id) AS followers,
 			(SELECT COUNT(*) FROM follower WHERE followerId = u.id) AS following
 		FROM user u
-		WHERE u.id != ?
+		WHERE u.id = ?
 	`, userId).Scan(
 		&user.Id,
 		&user.Email,
