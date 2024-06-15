@@ -172,7 +172,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = auth.GetUserFromToken(r)
+	cliams, err := auth.GetUserFromToken(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -182,6 +182,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	user.IsFollow = CheckIfCurrentUserFollows(cliams.UserId, userId)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(user)
 }
@@ -307,7 +308,7 @@ func SetUpStateAccount(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
-	var users []models.AnotherUser
+	var users []models.User
 
 	claims, err := auth.GetUserFromToken(r)
 	if err != nil {
@@ -317,7 +318,7 @@ func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
 	currentUserID := claims.UserId
 
 	query := `
-		SELECT u.id, u.username, u.avatarImage, 
+		SELECT u.id, u.username, u.avatarImage, u.state,
 			(SELECT COUNT(*) FROM follower WHERE followedId = u.id) AS followers,
 			(SELECT COUNT(*) FROM follower WHERE followerId = u.id) AS following
 		FROM user u
@@ -331,8 +332,8 @@ func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var user models.AnotherUser
-		err := rows.Scan(&user.Id, &user.Username, &user.AvatarImage, &user.Followers, &user.Following)
+		var user models.User
+		err := rows.Scan(&user.Id, &user.Username, &user.AvatarImage, &user.State, &user.Followers, &user.Following)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

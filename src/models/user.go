@@ -10,6 +10,7 @@ type User struct {
 	Biography   string `json:"biography"`
 	Followers   int    `json:"follower"`
 	Following   int    `json:"following"`
+	IsFollow    bool   `json:"isFollow"`
 	State       bool   `json:"state"`
 	AvatarImage string `json:"avatarImage"`
 }
