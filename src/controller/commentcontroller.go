@@ -79,17 +79,29 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
+	var postId int
+	err = database.Client.QueryRow("SELECT postId FROM comment WHERE id = ?", commentId).Scan(&postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	query := "DELETE FROM comment_reaction WHERE commentId = ?"
 	_, err = database.Client.Query(query, commentId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	query = "DELETE FROM comment WHERE commentId = ? AND userId = ?"
+	query = "DELETE FROM comment WHERE id = ? AND userId = ?"
 	_, err = database.Client.Query(query, commentId, claims.UserId)
 	if err != nil {
-		http.Error(w, "You do not have permission to delete this post", http.StatusForbidden)
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	comments, err := models.GetCommentsForPost(postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(comments)
 }
