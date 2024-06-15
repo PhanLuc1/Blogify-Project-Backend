@@ -8,6 +8,8 @@ type User struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	Biography   string `json:"biography"`
+	Followers   int    `json:"follower"`
+	Following   int    `json:"following"`
 	State       bool   `json:"state"`
 	AvatarImage string `json:"avatarImage"`
 }
@@ -30,13 +32,21 @@ type Token struct {
 }
 
 func GetInfoUser(userId int) (user User, err error) {
-	err = database.Client.QueryRow("SELECT user.id, user.email, user.username, user.biography ,user.state, user.avatarImage FROM user WHERE id = ?", userId).Scan(
+	err = database.Client.QueryRow(`
+		SELECT u.id, u.email, u.username, u.biography, u.state, u.avatarImage ,
+			(SELECT COUNT(*) FROM follower WHERE followedId = u.id) AS followers,
+			(SELECT COUNT(*) FROM follower WHERE followerId = u.id) AS following
+		FROM user u
+		WHERE u.id != ?
+	`, userId).Scan(
 		&user.Id,
 		&user.Email,
 		&user.Username,
 		&user.Biography,
 		&user.State,
 		&user.AvatarImage,
+		&user.Followers,
+		&user.Following,
 	)
 	if err != nil {
 		return user, err
