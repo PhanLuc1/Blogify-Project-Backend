@@ -20,17 +20,17 @@ type Comment struct {
 	IsCurrentUser   bool          `json:"isCommentUser"`
 }
 
-func GetCommentsForPost(postID int) ([]Comment, error) {
+func GetCommentsForPost(postID int, currentUserID int) ([]Comment, error) {
 	var comments []Comment
 
-	err := getCommentsRecursive(database.Client, &comments, postID, nil)
+	err := getCommentsRecursive(database.Client, &comments, postID, nil, currentUserID)
 	if err != nil {
 		return nil, err
 	}
 
 	return comments, nil
 }
-func getCommentsRecursive(db *sql.DB, comments *[]Comment, postID int, parentCommentID *int) error {
+func getCommentsRecursive(db *sql.DB, comments *[]Comment, postID int, parentCommentID *int, currentUserID int) error {
 	query := "SELECT id, userId, postId, parentCommentId, content, createAt FROM comment WHERE postId = ? AND parentCommentId "
 	if parentCommentID == nil {
 		query += "IS NULL"
@@ -69,11 +69,11 @@ func getCommentsRecursive(db *sql.DB, comments *[]Comment, postID int, parentCom
 		if err != nil {
 			return err
 		}
-		err = getCommentsRecursive(db, &comment.Replies, postID, &comment.Id)
+		err = getCommentsRecursive(db, &comment.Replies, postID, &comment.Id, UserId)
 		if err != nil {
 			return err
 		}
-
+		comment.IsCurrentUser = (UserId == currentUserID)
 		*comments = append(*comments, comment)
 	}
 

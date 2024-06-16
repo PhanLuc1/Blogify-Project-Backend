@@ -47,7 +47,7 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	comments, err := models.GetCommentsForPost(postId)
+	comments, err := models.GetCommentsForPost(postId, claims.UserId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -97,7 +97,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
-	comments, err := models.GetCommentsForPost(postId)
+	comments, err := models.GetCommentsForPost(postId, claims.UserId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

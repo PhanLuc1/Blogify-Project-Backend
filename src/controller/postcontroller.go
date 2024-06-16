@@ -44,7 +44,7 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		post.Comments, err = models.GetCommentsForPost(post.Id)
+		post.Comments, err = models.GetCommentsForPost(post.Id, claims.UserId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -59,7 +59,6 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		post.IsCurrentUser = false
 		post.IsCurrentUser = (post.User.Id == claims.UserId)
 		posts = append(posts, post)
 	}
@@ -186,7 +185,7 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	post.Comments, err = models.GetCommentsForPost(post.Id)
+	post.Comments, err = models.GetCommentsForPost(post.Id, claims.UserId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -201,7 +200,6 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	post.IsCurrentUser = false
 	post.IsCurrentUser = (post.User.Id == claims.UserId)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(post)
@@ -241,16 +239,19 @@ func GetPostsByUserId(w http.ResponseWriter, userId int, isCurrentUser bool) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		post.Comments, err = models.GetCommentsForPost(post.Id)
+		post.Comments, err = models.GetCommentsForPost(post.Id, userId)
+		for i := 0; i < len(post.Comments); i++ {
+			if isCurrentUser {
+				post.Comments[i].IsCurrentUser = true
+			} else {
+				post.Comments[i].IsCurrentUser = false
+			}
+		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if isCurrentUser {
-			post.IsCurrentUser = true
-		} else {
-			post.IsCurrentUser = false
-		}
+		post.IsCurrentUser = isCurrentUser
 		posts = append(posts, post)
 	}
 	w.WriteHeader(200)
