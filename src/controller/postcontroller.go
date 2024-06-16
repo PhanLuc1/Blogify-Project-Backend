@@ -2,13 +2,11 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
@@ -133,6 +131,7 @@ func UploadeHandle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	post.IsCurrentUser = true
+	post.Id = int(postId)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(post)
 }
@@ -335,14 +334,6 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	post := models.Post{
 		Caption: caption,
 	}
-	imagesToDelete := r.FormValue("imagesToDelete")
-	imagesToDeleteList := strings.Split(imagesToDelete, ",")
-
-	tx, err := database.Client.Begin()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
 	var postImages []models.PostImage
 	files := r.MultipartForm.File["images"]
@@ -374,38 +365,26 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	post.PostImages = postImages
 	if caption != "" {
 		query := "UPDATE post SET caption = ? WHERE id = ? AND userId = ?"
-		_, err = tx.Exec(query, caption, postId, claims.UserId)
+		_, err = database.Client.Exec(query, caption, postId, claims.UserId)
 		if err != nil {
-			tx.Rollback()
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error()+"2", http.StatusInternalServerError)
 			return
 		}
+	}
+	_, err = database.Client.Query("DELETE FROM postimage WHERE postId = ?", postId)
+	if err != nil {
+		http.Error(w, err.Error()+"3", http.StatusInternalServerError)
+		return
 	}
 	for _, image := range post.PostImages {
 		query := "INSERT INTO postimage (imageURL, postId, description) VALUES (? ,?, '')"
-		_, err = tx.Exec(query, image.ImageURL, postId)
+		_, err = database.Client.Exec(query, image.ImageURL, postId)
 		if err != nil {
-			tx.Rollback()
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error()+"3", http.StatusInternalServerError)
 			return
 		}
 	}
-	for _, deleteURL := range imagesToDeleteList {
-		query := "DELETE FROM postimage WHERE imageURL = ? AND postId = ?"
-		_, err = tx.Exec(query, deleteURL, postId)
-		if err != nil {
-			tx.Rollback()
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			fmt.Print(err.Error())
-			return
-		}
-	}
-	err = tx.Commit()
-	if err != nil {
-		tx.Rollback()
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
 	var postUpdated models.Post
 	query := "SELECT post.caption, post.createAt FROM post WHERE id = ?"
 	err = database.Client.QueryRow(query, postId).Scan(
