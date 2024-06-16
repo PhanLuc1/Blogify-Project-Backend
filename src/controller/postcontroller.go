@@ -367,20 +367,20 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		query := "UPDATE post SET caption = ? WHERE id = ? AND userId = ?"
 		_, err = database.Client.Exec(query, caption, postId, claims.UserId)
 		if err != nil {
-			http.Error(w, err.Error()+"2", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 	_, err = database.Client.Query("DELETE FROM postimage WHERE postId = ?", postId)
 	if err != nil {
-		http.Error(w, err.Error()+"3", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	for _, image := range post.PostImages {
 		query := "INSERT INTO postimage (imageURL, postId, description) VALUES (? ,?, '')"
 		_, err = database.Client.Exec(query, image.ImageURL, postId)
 		if err != nil {
-			http.Error(w, err.Error()+"3", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
