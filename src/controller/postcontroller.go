@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -394,7 +395,8 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		_, err = tx.Exec(query, deleteURL, postId)
 		if err != nil {
 			tx.Rollback()
-			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Print(err.Error())
 			return
 		}
 	}
