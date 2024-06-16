@@ -338,7 +338,7 @@ func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		user.State = CheckIfCurrentUserFollows(user.Id, currentUserID)
+		user.IsFollow = CheckIfCurrentUserFollows(currentUserID, user.Id)
 		users = append(users, user)
 	}
 
@@ -350,7 +350,7 @@ func GetOtherUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-func CheckIfCurrentUserFollows(userID, currentUserID int) bool {
+func CheckIfCurrentUserFollows(currentUserID int, userID int) bool {
 	query := `
 		SELECT COUNT(*) FROM follower WHERE followerId = ? AND followedId = ?
 	`
@@ -359,5 +359,6 @@ func CheckIfCurrentUserFollows(userID, currentUserID int) bool {
 	if err != nil {
 		return false
 	}
+	fmt.Print(count)
 	return count > 0
 }
