@@ -340,7 +340,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	tx, err := database.Client.Begin()
 	if err != nil {
-		http.Error(w, "Error beginning transaction", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -377,7 +377,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		_, err = tx.Exec(query, caption, postId, claims.UserId)
 		if err != nil {
 			tx.Rollback()
-			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -386,7 +386,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		_, err = tx.Exec(query, image.ImageURL, postId)
 		if err != nil {
 			tx.Rollback()
-			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -403,7 +403,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
-		http.Error(w, "Error committing transaction", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	var postUpdated models.Post
