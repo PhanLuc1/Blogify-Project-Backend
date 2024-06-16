@@ -17,6 +17,7 @@ type Comment struct {
 	CreateAt        time.Time     `json:"creatAt"`
 	Replies         []Comment     `json:"parentComment"`
 	Reaction        Reaction      `json:"reaction"`
+	IsCurrentUser   bool          `json:"isCommentUser"`
 }
 
 func GetCommentsForPost(postID int) ([]Comment, error) {

@@ -7,14 +7,15 @@ import (
 )
 
 type Post struct {
-	Id           int         `json:"id"`
-	User         User        `json:"user"`
-	Caption      string      `json:"caption"`
-	PostImages   []PostImage `json:"postImages"`
-	CreateAt     time.Time   `json:"createAt"`
-	CountComment int         `json:"countCommet"`
-	Comments     []Comment   `json:"comments"`
-	Reaction     Reaction    `json:"reaction"`
+	Id            int         `json:"id"`
+	User          User        `json:"user"`
+	Caption       string      `json:"caption"`
+	PostImages    []PostImage `json:"postImages"`
+	CreateAt      time.Time   `json:"createAt"`
+	CountComment  int         `json:"countCommet"`
+	Comments      []Comment   `json:"comments"`
+	Reaction      Reaction    `json:"reaction"`
+	IsCurrentUser bool        `json:"isCurrentUser"`
 }
 type PostImage struct {
 	Id          int    `json:"id"`

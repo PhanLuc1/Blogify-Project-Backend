@@ -19,6 +19,11 @@ import (
 func GetAllPost(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
 	var userId int
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 	query := "SELECT * FROM post"
 	result, err := database.Client.Query(query)
 	if err != nil {
@@ -54,7 +59,8 @@ func GetAllPost(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		post.IsCurrentUser = false
+		post.IsCurrentUser = (post.User.Id == claims.UserId)
 		posts = append(posts, post)
 	}
 	w.WriteHeader(200)
@@ -125,6 +131,7 @@ func UploadeHandle(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	post.IsCurrentUser = true
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(post)
 }
@@ -153,8 +160,13 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 	postId := vars["postid"]
 	var userId int
 	var post models.Post
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 	query := "SELECT * FROM post WHERE id = ?"
-	err := database.Client.QueryRow(query, postId).Scan(
+	err = database.Client.QueryRow(query, postId).Scan(
 		&post.Id,
 		&userId,
 		&post.Caption,
@@ -189,10 +201,12 @@ func GetPostById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	post.IsCurrentUser = false
+	post.IsCurrentUser = (post.User.Id == claims.UserId)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(post)
 }
-func GetPostsByUserId(w http.ResponseWriter, userId int) {
+func GetPostsByUserId(w http.ResponseWriter, userId int, isCurrentUser bool) {
 	var posts []models.Post
 	query := "SELECT post.id, post.caption, post.createAt FROM post WHERE userId = ?"
 	result, err := database.Client.Query(query, userId)
@@ -232,6 +246,11 @@ func GetPostsByUserId(w http.ResponseWriter, userId int) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		if isCurrentUser {
+			post.IsCurrentUser = true
+		} else {
+			post.IsCurrentUser = false
+		}
 		posts = append(posts, post)
 	}
 	w.WriteHeader(200)
@@ -244,17 +263,18 @@ func GetCurrentUserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	GetPostsByUserId(w, claims.UserId)
+	GetPostsByUserId(w, claims.UserId, true)
 }
 func GetUserPosts(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userid := vars["userid"]
 	userId, err := strconv.Atoi(userid)
+
 	if err != nil {
 		panic(err)
 	}
 
-	GetPostsByUserId(w, userId)
+	GetPostsByUserId(w, userId, false)
 }
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
