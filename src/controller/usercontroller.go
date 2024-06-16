@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -20,13 +19,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(password string) string {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 15)
-	if err != nil {
-		log.Panic(err)
-	}
-	return string(bytes)
-}
 func VerifyPassword(userpassword string, givenpassword string) (bool, string) {
 	err := bcrypt.CompareHashAndPassword([]byte(givenpassword), []byte(userpassword))
 	valid := true
@@ -53,7 +45,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password := HashPassword(user.Password)
+	password := auth.HashPassword(user.Password)
 	user.Password = password
 	query := "INSERT INTO user (email, username, password, biography, avatarImage) VALUES (?, ?, ?, ?, ?)"
 	_, err = database.Client.Query(query, user.Email, user.Username, user.Password, " ", user.AvatarImage)
