@@ -105,3 +105,39 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(comments)
 }
+func UpdateComment(w http.ResponseWriter, r *http.Request) {
+	var comment models.Comment
+	//commentId := vars["commentid"]
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	if comment.Content == "" {
+		w.WriteHeader(400)
+		return
+	}
+	query := "UPDATE comment SET comment.content = ? WHERE id = ? AND userId = ?"
+	_, err = database.Client.Query(query, comment.Content, comment.Id, claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	var postId int
+	err = database.Client.QueryRow("SELECT postId FROM comment WHERE id = ?", comment.Id).Scan(&postId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	comments, err := models.GetCommentsForPost(postId, claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(comments)
+}

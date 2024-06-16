@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PhanLuc1/Blogify-Project-Backend/src/auth"
@@ -311,4 +312,135 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(200)
+}
+func UpdatePost(w http.ResponseWriter, r *http.Request) {
+	Vars := mux.Vars(r)
+	postId := Vars["postid"]
+	postIdInt, err := strconv.Atoi(postId)
+	if err != nil {
+		panic(err)
+	}
+	claims, err := auth.GetUserFromToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	err = r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	caption := r.FormValue("caption")
+	post := models.Post{
+		Caption: caption,
+	}
+	imagesToDelete := r.FormValue("imagesToDelete")
+	imagesToDeleteList := strings.Split(imagesToDelete, ",")
+
+	tx, err := database.Client.Begin()
+	if err != nil {
+		http.Error(w, "Error beginning transaction", http.StatusInternalServerError)
+		return
+	}
+
+	var postImages []models.PostImage
+	files := r.MultipartForm.File["images"]
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		fileName := filepath.Join("C:\\Users\\Admin\\Desktop\\image-blogify", fileHeader.Filename)
+		dst, err := os.Create(fileName)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, file); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		postImages = append(postImages, models.PostImage{
+			ImageURL:    fileHeader.Filename,
+			Description: "",
+		})
+	}
+	post.PostImages = postImages
+	if caption != "" {
+		query := "UPDATE post SET caption = ? WHERE id = ? AND userId = ?"
+		_, err = tx.Exec(query, caption, postId, claims.UserId)
+		if err != nil {
+			tx.Rollback()
+			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			return
+		}
+	}
+	for _, image := range post.PostImages {
+		query := "INSERT INTO postimage (imageURL, postId, description) VALUES (? ,?, '')"
+		_, err = tx.Exec(query, image.ImageURL, postId)
+		if err != nil {
+			tx.Rollback()
+			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			return
+		}
+	}
+	for _, deleteURL := range imagesToDeleteList {
+		query := "DELETE FROM postimage WHERE imageURL = ? AND postId = ?"
+		_, err = tx.Exec(query, deleteURL, postId)
+		if err != nil {
+			tx.Rollback()
+			http.Error(w, "Error updating caption", http.StatusInternalServerError)
+			return
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		http.Error(w, "Error committing transaction", http.StatusInternalServerError)
+		return
+	}
+	var postUpdated models.Post
+	query := "SELECT post.caption, post.createAt FROM post WHERE id = ?"
+	err = database.Client.QueryRow(query, postId).Scan(
+		&postUpdated.Caption,
+		&postUpdated.CreateAt,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.Id = postIdInt
+	postUpdated.User, err = models.GetInfoUser(claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.Comments, err = models.GetCommentsForPost(post.Id, claims.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.CountComment, err = models.GetAmountCommentPost(post.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.PostImages, err = models.GetImagePost(postIdInt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.Reaction, err = models.GetReactionPost(post.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	postUpdated.IsCurrentUser = (post.User.Id == claims.UserId)
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(postUpdated)
 }
