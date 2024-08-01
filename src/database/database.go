@@ -18,6 +18,7 @@ func DBSet() *sql.DB {
 		log.Fatal(err.Error())
 	}
 	fmt.Println("Susscessfully connected to MYSQL !!")
+	fmt.Printf("Connected to")
 	return db
 }
 
